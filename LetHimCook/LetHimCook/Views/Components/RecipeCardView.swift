@@ -5,39 +5,72 @@ struct RecipeCardView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
+            // Картинка
             AsyncImage(url: URL(string: recipe.image ?? "")) { phase in
                 switch phase {
                 case .success(let image):
-                    image.resizable().aspectRatio(contentMode: .fill)
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(height: 220) // Трохи збільшили висоту
+                        .clipped()
                 case .empty:
-                    Color.gray.opacity(0.3)
+                    Color.gray.opacity(0.3).frame(height: 220)
                 default:
-                    Color.gray.opacity(0.3)
+                    Color.gray.opacity(0.3).frame(height: 220)
                 }
             }
-            .frame(height: 200)
             
+            // Затемнення знизу для тексту (Гарніший градієнт)
+            LinearGradient(
+                colors: [.black.opacity(0.8), .transparent],
+                startPoint: .bottom,
+                endPoint: .top
+            )
+            .frame(height: 100)
+            
+            // Текст та інформація
             VStack(alignment: .leading) {
-                Spacer()
-                LinearGradient(
-                    gradient: Gradient(colors: [.clear, .black.opacity(0.8)]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: 80)
-                .overlay(
-                    Text(recipe.title)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .lineLimit(2)
-                        .padding(),
-                    alignment: .bottomLeading
-                )
+                Text(recipe.title)
+                    .font(.system(size: 20, weight: .bold, design: .rounded)) // Округлий шрифт
+                    .foregroundColor(.white)
+                    .lineLimit(2)
+                    .shadow(radius: 2) // Тінь для тексту, щоб читалось на будь-якому фоні
+                
+                HStack {
+                    Image(systemName: "flame.fill")
+                        .foregroundColor(.orange)
+                        .font(.caption)
+                    Text("Tap to cook")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                        .textCase(.uppercase)
+                }
             }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .cornerRadius(15)
-        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 5)
+        .background(Color(UIColor.systemBackground)) // Адаптується під темну/світлу тему
+        .cornerRadius(20)
+        // Магічна тінь (Glow effect)
+        .shadow(color: Color.orange.opacity(0.3), radius: 15, x: 0, y: 10)
+        .overlay(
+            // Тонка рамка-градієнт навколо картки
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(
+                    LinearGradient(
+                        colors: [.orange.opacity(0.5), .clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
         .padding(.horizontal)
     }
+}
+
+// Допоміжний розширення для прозорого кольору
+extension Color {
+    static let transparent = Color.white.opacity(0)
 }
